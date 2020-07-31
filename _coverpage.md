@@ -1,6 +1,6 @@
-# WLBFed/WorkLife Balance Frontend development
+# WorkLife Balance Frontend development
 
-> 学习总动员，目标九月前完成技术进步
+> You have to work hard until you get what you want.
 
 [算法](algorithm/index)
 [前端技术](frontend/index)
