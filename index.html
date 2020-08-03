@@ -13,6 +13,7 @@
       rel="stylesheet"
       href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css"
     />
+    <link rel="stylesheet" href="//unpkg.com/gitalk/dist/gitalk.css" />
   </head>
   <body>
     <div id="app"></div>
@@ -25,6 +26,10 @@
       }
     </script>
     <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+    <script src="//unpkg.com/docsify/lib/plugins/gitalk.min.js"></script>
+    <script src="//unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script src="//unpkg.com/docsify-copy-code"></script>
+
     <script>
       const gitalk = new Gitalk({
         clientID: 'f788330aafb595f03606',
