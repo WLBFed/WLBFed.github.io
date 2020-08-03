@@ -16,7 +16,9 @@
     <link rel="stylesheet" href="//unpkg.com/gitalk/dist/gitalk.css" />
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="gitalk-container"></div>
+    </div>
     <script>
       window.$docsify = {
         name: 'WLBFed 学习吧',
@@ -26,8 +28,7 @@
       }
     </script>
     <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
-    <script src="//unpkg.com/docsify/lib/plugins/gitalk.min.js"></script>
-    <script src="//unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script src="//unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
     <script src="//unpkg.com/docsify-copy-code"></script>
 
     <script>
@@ -35,9 +36,10 @@
         clientID: 'f788330aafb595f03606',
         clientSecret: '2c1f8a354fd6978838ecc658c0585d50b82bfe95',
         repo: 'https://github.com/WLBFed/WLBFed.github.io',
-        owner: 'https://github.com/WLBFed',
-        admin: ['MIFind', 'zhangleinice'],
-        distractionFreeMode: false,
+        owner: 'WLBFed',
+        admin: ['MIFind', 'zhangleinice', 'WLBFed'],
+        id: 'window.location.pathname',
+        distractionFreeMode: true,
       })
     </script>
   </body>
