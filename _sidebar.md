@@ -1,10 +1,10 @@
 - JS 基础
 
-  - [学习指南](js/index.md)
+  - [JavaScript](js/index.md)
 
 - CSS 基础
 
-  - [学习指南](css/index.md)
+  - [CSS](css/index.md)
 
 - 框架原理
 
@@ -36,7 +36,7 @@
   - [http/CDN/DNS/TCP](net/http/index.md)
   - [网络相关面试题](net/interview/index.md)
 
-- [数据结构与算法](algorithm/index.md)
+- 数据结构与算法
 
   - [数据结构](algorithm/data-structure/index.md)
   - [常见算法题](algorithm/normal/index.md)
