@@ -18,8 +18,8 @@
 
 - 工程化
 
-  - [webpack](/engineering/index.md)
-  - [babel](engineering/babel.md)
+  - [webpack](engineering/webpack/index.md)
+  - [babel](engineering/babel/index.md)
   - [模板引擎](engineering/template/index.md)
   - [CI/CD](engineering/cicd/index.md)
   - [前端监控](engineering/monitor/index.md)
@@ -36,7 +36,7 @@
   - [http/CDN/DNS/TCP](net/http/index.md)
   - [网络相关面试题](net/interview/index.md)
 
-- 数据结构与算法
+- [数据结构与算法](algorithm/index.md)
 
   - [数据结构](algorithm/data-structure/index.md)
   - [常见算法题](algorithm/normal/index.md)
