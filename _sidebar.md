@@ -40,11 +40,3 @@
 
   - [数据结构](algorithm/data-structure/index.md)
   - [常见算法题](algorithm/normal/index.md)
-
-- 面试经验
-
-  - [学习指南](interview/index.md)
-
-- 加入我们
-
-  - [一起学习啊](joinus/index.md)
