@@ -1,5 +1,17 @@
 # Javascript 基础
 
+## 0. 值类型和引用类型
+
+js 中变量类型有哪些：值类型和引用类型
+
+- 值类型：空间固定，保存在栈中，保存和复制都是值本身，typeof 可以检测值类型。（string number boolean undefined symbol null）
+- 引用类型：占用空间不固定，保存在堆中，堆内存是动态内存，保存与复制的是执行对象的一个指针，使用 instanceof 检测。Object、Array、Function(Array/Function 都在 Object 的原型链上)
+
+```
+const a = {name: 'test'}
+堆内存中持有的是对象元数据，栈内存里只有的是堆内存数据的引用地址。复制时，引用类型复制的是地址，值类型复制的是值。
+```
+
 ## 1. 什么是作用域？
 
 作用域就是变量的访问规则，也就是规定了那些变量可以被访问，哪些变量不可以被访问。
@@ -223,7 +235,7 @@ function instanceof(left, right){
 
 ### 10. for in? for of？iterator?
 
-1. for in: 用于数组循环返回的是数组下标和挂载在原型上的键。
+1. for in: 用于数组循环返回的是数组下标和挂载在原型上的键。用于对象不仅可以循环枚举自身属性，还可以枚举原型链中的属性。
 
 2. for of
 
@@ -361,10 +373,133 @@ Promise.race = function(promises){
 
 ## 13. JS 中的事件机制以及在浏览器和 Node 中的区别。
 
+进程：CPU 资源分配的最小单位
+线程：CPU 调度的最小单位
+一个应用可能是一个进程，一个进程里可能会分配不同的线程去做不同的事儿。
+比如浏览器打开一个 Tab 页就是一个进程，一个进程可以有多个线程，渲染线程、JS 引擎线程、Http 请求线程。
+
+浏览器内核是多线程由不同的线程组成：
+
+- GUI 渲染线程
+- JavaScript 引擎线程
+- 定时触发器线程
+- 事件触发线程
+- 异步 http 请求线程
+
+### 浏览器中的 EventLoop
+
+事件循环中异步队列有两种：宏任务队列和微任务队列。
+宏任务：setTimeout、setInterval、setImmediate、script（整体代码）、I/O、UI 渲染
+微任务：process.nextTick、new Promise().then(回调)
+
+**_先执行宏任务，当某个宏任务执行完后，会查看是否有微任务队列，如果有，先执行微任务队列中的所有任务，如果没有，会再读取宏任务丢列中排在最前的任务，执行宏任务过程中，遇到微任务，依次加入微任务队列，栈空后，再次读取微任务队列里的任务。_**
+
+### Node 中的 EventLoop
+
+Node 的运行机制：
+
+- V8 引擎解析 JavaScript 脚本
+- 解析后的代码调用 NodeAPI
+- libuv 库负责 NodeAPI 的执行，它将不同的任务分配给不同的线程，形成一个 EventLoop，以一步的方式将任务的执行结果返回给 V8 引擎。
+- V8 引擎再将结果返回给用户。
+
+**_在 Node 端，微任务会在事件循环的各个阶段执行，也就是一个阶段执行完毕，就会去执行 microtask。_**
+
 ## 14. CommonJS、ES6 Module
+
+首先 CommonJS 是不适合浏览器加载的，因为 CommonJS 的 require 语法是同步的，当我们使用 require 加载一个模块之后，才会执行到后面的代码
+。因为浏览器端的文件一般存放在服务器或者 CDN 中，如果使用同步的方式加载一个模块，可能会造成浏览器阻塞。所以它更适合在 NodeJS 服务端使用，直接从本地硬盘读取文件。
+
+**CommonJS 和 ES6 模块的差异：**
+
+1. `CommonJS 模块输出的是一个值的拷贝`：一旦输出了某个值，如果模块内部后续的变化，影响不了外部对这个值的使用，CommonJS 引用的变量被缓存。
+
+   `ES6 模块输出的是值的引用`：JS 引擎对脚本静态分析的时候，遇到模块加载命令`import`，就会生成一个只读引用，等到脚本真正之星的时候，再根据这个只读引用，到被加载的那个模块去取值，由于是动态引用，所以如果使用 import 加载一个变量，变量不会被缓存。
+
+2. `CommonJS 模块是运行时加载`：CommonJS 其实加载的是一个对象，这个对象只有在脚本运行时才会生成，而且只会生成一次
+
+   `ES6 模块是编译时输出接口`：ES6 模块的对外接口只是一个静态定义，在代码静态解析的阶段就会生成，这样我们可以对 JS 模块进行依赖分析，优化代码，tree shaking 和 scope hoisting 实际上就是依赖 ES6 模块化。
 
 ## 15. 输入 URL 到显示页面，都经历了什么
 
+1. 浏览器输入 url
+2. 浏览器先查看浏览器缓存-系统缓存-路由器缓存，如果缓存命中，会直接在屏幕上展示页面内容。
+3. 在发送 http 请求前，需要进行域名解析 （DNS 解析），（DNS 域名系统，是互联网的一项核心业务，可以将域名和 IP 地址互相映射的一个分布式数据库，让人们不用直接记住 IP。），解析获取相应的 IP 地址。
+4. 浏览器向服务器发起 tcp 链接，与浏览器建立起 tcp 三次握手，（TCP 即传输控制协议，TCP 链接是互联网连接协议的一种）
+5. 握手成功后，浏览器向服务器发送 http 请求，请求数据包。
+6. 服务器处理收到的请求，将数据返回至浏览器。
+7. 浏览器收到 http 相应
+8. 读取页面内容，浏览器渲染，解析 html 源码
+9. 解析 html 生成 DOM 树，解析 CSS 生成 CSS 树，生成 render 树，处理回流和重绘，处理 js 交互，直到渲染好页面。
+10. 客户端与服务器交互
+11. ajax 查询
+
+**查找缓存 > DNS 解析 > 建立 TCP 连接 > 发送请求 > 渲染数据 > 结束**
+
 ## 16. v8 垃圾回收机制
 
+JS 中内存管理的主要概念是可达性。
+简单地说，可达性就是那些以某种方式可访问或可用的值，他们被保证存储在内存中。
+
+垃圾回收的基本工作原理是通过标记清除算法：
+
+`标记-清除`算法：垃圾回收器获取根并标记它们，然后访问并标记所有来自它们的引用，然后所有被访问的对象都被记住，以此类推，知道有未访问的引用为止，除了标记的对象外，所有对象都被删除。
+
+JS 引擎做了一些优化：
+
+- 分代回收：由于做垃圾回收检查是很消耗的一件事，JS 做了分代回收的优化，对象分为两组，新对象和旧对象。创建了对象的内存后，完成该对象的工作并迅速结束，他们很快就会被清理干净，有一些活的足够久的，就回被分到“旧对象”，并且很少接受检查。
+
+- 增量回收：如果有很多对象，那做回收会很耗时，JS 引擎将垃圾回收分解为多个部分，然后分别执行，这样只需要额外的标记来跟踪变化，只有很多微小的延迟，而不是很大的延迟。
+
+- 空闲时间回收：垃圾回收器只有在 CPU 空闲时运行，以减少对执行的影响。
+
 ## 17. 如何解决 script 标签阻塞渲染问题
+
+- 一个方法是`<script>`元素加入 defer 属性，它的作用是延迟脚本的执行，等到 HTML 解析完成后，再执行脚本。
+- 还可以加上 async 属性，使用另一个进程下载脚本，脚本下载完成，暂停 HTML 解析，开始执行下载的脚本，脚本执行完毕，恢复解析 HTML 页面。
+- 还可以使用动态脚本，在动态生成 script 标签，但是现在不这么玩了已经。
+
+## 18. link 资源 preload
+
+```
+  <link rel="preload" href="style.css" as="style">
+  <link rel="preload" href="main.js" as="script">
+```
+
+那些文件可以被预加载？
+
+- audio、video、document（将要嵌入 frame 的文档）、fetch 资源（通过 xhr 和 fetch 请求的资源）、font、image、script、style、worker（web worker 或 shared workder）、
+
+prefetch 是高速浏览器加载`下一个页面`可能用到的资源，也就是加载下一页面的加载速度。
+
+preload 是预加载本页资源
+
+`优化结构`
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Faster</title>
+  <link rel="dns-prefetch" href="//cdn.cn/">
+
+  <link rel="preload" href="//cdn.cn/webfont.woff2" as="font">
+  <link rel="preload" href="//cdn.cn/Page1-A.js" as="script">
+  <link rel="preload" href="//cdn.cn/Page1-B.js" as="script">
+
+  <link rel="prefetch" href="//cdn.cn/Page2.js">
+  <link rel="prefetch" href="//cdn.cn/Page3.js">
+  <link rel="prefetch" href="//cdn.cn/Page4.js">
+
+  <style type="text/css">
+    /* 首页用到的CSS内联 */
+  </style>
+</head>
+<body>
+
+<script type="text/javascript" src="//cdn.cn/Page1-A.js" defer></script>
+<script type="text/javascript" src="//cdn.cn/Page1-B.js" defer></script>
+</body>
+</html>
+```
