@@ -8,7 +8,7 @@
 
 - 框架原理
 
-  - [React](frame/react/index.md)
+  - [React](frame/react/index)
   - [Vue](frame/vue/index.md)
   - [redux](frame/redux/index.md)
   - [mobx](frame/mobx/index.md)

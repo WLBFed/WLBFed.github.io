@@ -1,6 +1,6 @@
 # WorkLife Balance Frontend development
 
-> You have to work hard until you get what you want.
+> 逐渐构建起大前端知识体系.
 
 [算法](algorithm/index)
 [前端技术](frontend/index)
