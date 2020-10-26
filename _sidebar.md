@@ -1,6 +1,7 @@
 - 算法学习
 
   - [学习指南](algorithm/index.md)
+    - [学习指南](algorithm/index.md)
 
 - 前端技术
 
