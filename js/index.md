@@ -405,6 +405,15 @@ Node 的运行机制：
 
 **_在 Node 端，微任务会在事件循环的各个阶段执行，也就是一个阶段执行完毕，就会去执行 microtask。_**
 
+setTimeout/setInterval 属于 timers 类型；
+setImmediate 属于 check 类型；
+socket 的 close 事件属于 close callbacks 类型；
+其他 MacroTask 都属于 poll 类型。
+process.nextTick 本质上属于 MicroTask，但是它先于所有其他 MicroTask 执行；
+所有 MicroTask 的执行时机，是不同类型 MacroTask 切换的时候。
+idle/prepare 仅供内部调用，我们可以忽略。
+pending callbacks 不太常见，我们也可以忽略。
+
 ## 14. CommonJS、ES6 Module
 
 首先 CommonJS 是不适合浏览器加载的，因为 CommonJS 的 require 语法是同步的，当我们使用 require 加载一个模块之后，才会执行到后面的代码
@@ -430,7 +439,19 @@ Node 的运行机制：
 6. 服务器处理收到的请求，将数据返回至浏览器。
 7. 浏览器收到 http 相应
 8. 读取页面内容，浏览器渲染，解析 html 源码
-9. 解析 html 生成 DOM 树，解析 CSS 生成 CSS 树，生成 render 树，处理回流和重绘，处理 js 交互，直到渲染好页面。
+9. 浏览器渲染页面
+
+   - 浏览器解析 HTML 标签，构建 DOM 树。
+   - 浏览器解析 CSS，构建 CSSOM 树。
+   - DOM 树与 CSSOM 树结合形成 render 树
+   - 浏览器得到渲染树后开始计算每个节点的位置信息，进行 layout 布局。
+   - 布局完成后，浏览器将每个节点绘制到屏幕上。
+
+     _这里需要注意_:
+
+     - script 是同步加载，浏览器遇到 script 要等下载完成在继续解析 HTML，所以 script 要放在最底部，或者设置 defer 或 async。
+     - link 标签请求 CSS 文件，是异步加载，但是如果 CSS 文件较大，DOM 树已经构建完成，CSSOM 还没构建完成，chrome 会出现白屏，因为他认为没有 CSSOM 的 paint 是无意义的，这里给 link 设置 preload 就很重要。
+
 10. 客户端与服务器交互
 11. ajax 查询
 
