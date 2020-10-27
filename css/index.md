@@ -215,3 +215,12 @@ flex布局+align
 1. 解决类名冲突的问题
 2. 使用 PostCSS 或者 Webpack 等构建工具进行编译
 3. 在 HTML 模板中使用编译过程产生的类名（对象.类名的方式来获取）
+
+## 15. 加载 CSS 的方式： 内联、link、head 里写 style、导入样式
+
+## 16. link 和 import 的区别
+
+- link 属于 HTML 标签，而@import 是 CSS 提供的;
+- 页面被加载的时，link 会同时被加载，而@import 引用的 CSS 会等到页面被加载完再加载;
+- import 只在 IE5 以上才能识别，而 link 是 HTML 标签，无兼容问题;
+- link 方式的样式的权重 高于@import 的权重.

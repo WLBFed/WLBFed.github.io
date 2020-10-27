@@ -524,3 +524,63 @@ preload 是预加载本页资源
 </body>
 </html>
 ```
+
+## 19. defineProperty 和 proxy
+
+defineProperty 可以拦截 get 和 set，读取 get，设置 set 行为，这样就可以拦截变化。
+
+```
+function watch(obj,prop,cb){
+    let value = obj[prop]
+    Object.defineProperty(obj,prop,{
+        get:function(){
+            return{
+                value
+            }
+        },
+        set:function(v){
+            value = v
+            cb(v)
+        }
+    })
+}
+let company = {name:'yd'}
+
+watch(company,'brand',(v)=>{
+    console.log(v,'brand 改变了')
+})
+company.brand = 'yeahbra'`
+```
+
+proxy 更加强大，因为 defineProperty 只能重定义属性的读取 get 和设置 set 行为，到了 es6，提供了 proxy，就可以重定义更多的行为，比如 in、delete、函数调用
+。
+
+```
+
+function watch(target, func) {
+  const proxy = new Proxy(target, {
+    get: function (target, prop) {
+      console.log("get")
+      return target[prop]
+    },
+    set: function (target, prop, value) {
+      console.log("set")
+      target[prop] = value
+      func(prop, value)
+    },
+  })
+  return proxy
+}
+
+var obj = {
+  value: 1,
+}
+
+const newObj = watch(obj, function (key, newValue) {
+  // 这里进行dom变化
+  console.log("这里进行dom变化")
+})
+
+newObj.value = 2
+console.log(newObj.value)
+```
