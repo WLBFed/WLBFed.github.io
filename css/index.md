@@ -1,5 +1,13 @@
 # CSS
 
+## 0. position 的种类
+
+- position:absolute 绝对定位，相对于第一个父元素
+- position:fixed 绝对定位，相对于浏览器窗口
+- position:relative 相对定位，相对于正常位置
+- position:static 默认的，没有定位，元素出现在正常的流中，忽略 top/bottom/left/right
+- position:inherit 从父元素集成的 position
+
 ## 1. CSS 选择器的优先级
 
 1. !important，会覆盖页面内任何位置定义的元素样式。

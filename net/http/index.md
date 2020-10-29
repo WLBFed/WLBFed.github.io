@@ -193,3 +193,29 @@ user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (
 
 1. cookie 存在客户端，session 存在服务端
 2. 域支持的范围不一样，a.com 的 cookie 在 api.a.com 下能用，但是 session 不行。
+
+## 8. localstorage 相关问题
+
+1. a.meituan.com 和 b.meituan.com 这两个域能够共享同一个 localStorage 吗？
+
+- 统一域名下共享一个 localStorage，a.meituan.com 和 b.meituan.com 是两个域名，不能共享。
+
+2. 在 webview 中打开一个页面：i.meituan.com/home.html，点击一个按钮，调用 js 桥打开一个新的 webview：i.meituan.com/list.html，这两个分属不同 webview 的页面能共享同一个 localStorage 吗？
+
+- 可以共享，相当于同一个浏览器的不同标签页，不同浏览器不能共享。
+
+3. 如果 localStorage 存满了，再往里存东西，或者要存的东西超过了剩余容量，会发生什么？怎么办？
+
+- 存不进去并报错，解决，首先我们在工程初步架构的时候就应该避免这样的问题，划分域名，单页配备单一域名，业务数据用 localStorage，文件类型就 indexDB 存了，那如果不可避免的话，我们存的时候需要为每个存的值设置时间戳，然后自己做一个 LRU 算法，存入时间最久、近期最少使用的就干掉再存。
+
+## 9. 单点登录的三种方式
+
+1. 父域 Cookie
+   `tieba.baidu.com`和`map.baidu.com`可共用`.baidu.com`父域的 cookie，达到共用登录态，但是不支持跨主域。
+
+2. 通过 iframe
+   A 域登陆成功后，生成 iframe 标签，请求 src，将要传递的 cookie 放到 url 中携带过去，src 路径为 B 域，B 域解析 URL，将传过来的信息保存，就可以共享登录态了。
+
+## 10. get/post 区别
+
+最直观的区别就是 GET 把参数包含在 URL 中，POST 通过 request body 传递参数。 ... GET 请求参数会被完整保留在浏览器历史记录里，而 POST 中的参数不会被保留。 GET 请求在 URL 中传送的参数是有长度限制的，而 POST 么有。 对参数的数据类型，GET 只接受 ASCII 字符，而 POST 没有限制

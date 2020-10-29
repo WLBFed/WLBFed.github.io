@@ -24,6 +24,21 @@ JS 中有哪些作用域？
 - 词法（静态）作用域：函数内部访问变量，总是寻找最近的那个作用域。
 - 动态作用域：作用域是基于调用栈，而不是代码中的作用域嵌套，js 中除了 this 都是词法作用域。
 
+### 插播一个 this
+
+```
+var a = 10;
+var obj = {
+    a: 99,
+    fn1:()=>{ console.log(this.a) },
+    fn2:function(){ console.log(this.a) }
+}
+obj.fn1(); //10
+obj.fn2(); //99
+```
+
+箭头函数本身没有 this，指向他定义时候的上下文，而不同函数的 this 指向它的调用对象。
+
 ## 2. 闭包
 
 函数 A 内部有一个函数 B，函数 B 能访问到函数 A 内部变量，函数 B 就是闭包。
@@ -282,55 +297,68 @@ for(let v of newCar){
 
 ## 12. promise 实现原理（怎么实现取消？怎么实现 promise all、race 等？）
 
-Promise 实现
+说到底 Promise 还是回调函数，只不过把回调函数封装到内部，使用 then 方法的链式调用。
 
 ```
-const PENDING = 'PENDING'
-const RESOLVED = 'RESOLVED'
-const REJECT = 'REJECT'
+const PENDING = 'pending'
+const RESOLVED = 'resolved'
+const REJECTED = 'rejected'
 
-function Promise(fn){
-    const self = this
-    self.state = PENDING
-    self.resolvedCallbacks = []
-    self.rejectedCallbacks = []
-    function resolve(value){
-        if(self.state === PENDING){
-            self.state = RESOLVED
-            self.value = value
-            self.resolvedCallbacks.map(cb => cb(self.value))
-        }
+function MyPromise(fn) {
+  const that = this
+  that.state = PENDING
+  that.value = null
+  that.resolvedCallbacks = []
+  that.rejectedCallbacks = []
+  function resolve(value) {
+    if (that.state === PENDING) {
+      that.state = RESOLVED
+      that.value = value
+      that.resolvedCallbacks.map((cb) => cb(that.value))
     }
-    function reject(value){
-        if(self.state === REJECT){
-            self.state = REJECT
-            self.value = value
-            self.rejectedCallbacks.map(cb => cb(self.value))
-        }
+  }
+
+  function reject(value) {
+    if (that.state === PENDING) {
+      that.state = REJECTED
+      that.value = value
+      that.rejectedCallbacks.map((cb) => cb(that.value))
     }
-    try{
-        fn(resolve, reject)
-    }catch(e){
-        reject(e)
-    }
+  }
+  try {
+    fn(resolve, reject)
+  } catch (e) {
+    reject(e)
+  }
 }
 
-Promise.prototype.then = function(onResolved, onRejected){
-    const self = this
-    onResolved = typeof onResolved === 'function'? onResolved: v => v
-    onRejected = typeof onRejected === 'function'? onRejected: v => v
-
-    if(self.state === PENDING){
-        self.resolvedCallbacks.push(onResolved)
-        self.rejectedCallbacks.push(onRejected)
-    }
-    if(self.state === RESOLVED){
-        onResolved(self.this)
-    }
-    if(self.state === REJECT){
-        onRejected(self.this)
-    }
+MyPromise.prototype.then = function (onFulfilled, onRejected) {
+  const that = this //对传入的两个参数做判断，如果不是函数将其转为函数
+  onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : (v) => v // onFulfilled = v => v
+  onRejected =
+    typeof onRejected === 'function'
+      ? onRejected
+      : (r) => {
+          throw r
+        }
+  if (that.state === PENDING) {
+    that.resolvedCallbacks.push(onFulfilled)
+    that.rejectedCallbacks.push(onRejected)
+  } else if (that.state === RESOLVED) {
+    onFulfilled(that.value)
+  } else {
+    onRejected(that.value)
+  }
 }
+
+new MyPromise((resolve, reject) => {
+  setTimeout(() => {
+    resolve('成功的回调数据')
+  }, 1000)
+}).then((value) => {
+  console.log('Promise.then: ', value)
+})
+
 ```
 
 Promise.all
@@ -584,3 +612,94 @@ const newObj = watch(obj, function (key, newValue) {
 newObj.value = 2
 console.log(newObj.value)
 ```
+
+## 20. DOM 和 BOM 的区别和联系
+
+BOM 就是 Browser Object Model，浏览器对象模型，就是把浏览器当做一个对象，提供 API 来操作 window ，打开窗口、打开选项卡、关闭页面、收藏夹、窗口位置及大小、location 的操作、navigator 来检测浏览器和插件、history 前进后退都是属于浏览器级别的操作。
+
+DOM 是 Document Object Model，文档对象模型，就是把文档流当成一个对象，提供 API 来操作文档流，比如 getElementById。
+
+## 21. 继承
+
+### ES5 实现继承
+
+**_组合继承_**：这种继承方式优点在于构造函数可以传参，不会与父类引用属性共享，可以复用父类的函数，但是也存在一个缺点就是在继承父类函数的时候调用了父类构造函数，导致子类的原型上多了不需要的父类属性，存在内存上的浪费。
+
+```
+function Parent(value) {
+  this.val = value
+}
+Parent.prototype.getValue = function() {
+  console.log(this.val)
+}
+function Child(value) {
+  // 子类通过构造调用Parent.call继承父类的属性
+  Parent.call(this, value)
+}
+// 然后改变子类的原型为父类的实例，继承父类的函数
+Child.prototype = new Parent()
+
+const child = new Child(1)
+
+child.getValue() // 1
+child instanceof Parent // true
+```
+
+**_寄生组合式继承_**：寄生组合式继承的核心是讲父类的原型付给了子类，并且将构造函数设置为子类。
+
+```
+function Parent(value) {
+  this.val = value
+}
+Parent.prototype.getValue = function() {
+  console.log(this.val)
+}
+
+function Child(value) {
+  Parent.call(this, value)
+}
+Child.prototype = Object.create(Parent.prototype, {
+  constructor: {
+    value: Child,
+    enumerable: false,
+    writable: true,
+    configurable: true
+  }
+})
+
+const child = new Child(1)
+
+child.getValue() // 1
+child instanceof Parent // true
+
+```
+
+### ES6 继承的原理
+
+ES6 继承的原理跟寄生组合式继承是一样的，通过 Object.create 传入父类的原型，直接付给子类，然后再用子类的构造函数修改 this。
+
+```
+class Point{}
+class ColorPoint extends Point{}
+```
+
+转换后
+
+```
+function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+        throw new TypeError("Super expression must either be null or a function");
+    }
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+        constructor: {
+            value: subClass, writable: true, configurable: true
+        }
+    });
+    if (superClass) _setPrototypeOf(subClass, superClass);
+}
+
+```
+
+ES5 的继承实质是先创建子类的实例对象 this，然后将父类的方法添加到 this 上。
+
+ES6 的继承实质是先将父类实例对象的方法和属性加到 this 上面，然后在用子类的构造函数修改 this。

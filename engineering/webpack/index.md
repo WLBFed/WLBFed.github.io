@@ -2,7 +2,7 @@
 
 ## 0. 什么是 webpack 和 grunt 和 gulp 有什么区别
 
-webpack 是一个模块打包器，可以递归打包项目中的所有模块，进行分析转化编译输出，最终生成几个打包后的 we 年。和其他工具最大的区别在于他支持 code-splitting、模块化、全局分析。
+webpack 是一个模块打包器，可以递归打包项目中的所有模块，进行分析转化编译输出，最终生成几个打包后的文件。和其他工具最大的区别在于他支持 code-splitting、模块化、全局分析。
 
 ## 1. loader 和 plugin
 
@@ -91,3 +91,7 @@ Tree-shaking 的本质是消除无用的 js 代码，实际情况中，虽然依
 1. 浏览器在用户访问页面的时候，为了加快加载速度，会对用户访问的静态资源进行存储，但是每一次代码升级或是更新，都需要浏览器去下载新的代码，最方便和简单的更新方式就是引入新的文件名称。
 2. 在 webpack 中可以在 output 纵输出的文件指定 chunkhash,并且分离经常更新的代码和框架代码。
 3. 通过 NameModulesPlugin 或是 HashedModuleIdsPlugin 使再次打包文件名不变。
+
+## 11. webpack 的生命周期
+
+可以安装 lifecycle-webpack-plugin 查看生命周期信息

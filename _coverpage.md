@@ -4,7 +4,3 @@
 
 [开始学习](js/index)
 [面经](interview/index)
-
-<!-- 背景色 -->
-
-![color](#fbb30b)

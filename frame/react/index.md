@@ -23,9 +23,11 @@ Diff 就是一个 patch 函数，用来查看新旧 tree 的差别，从而做 D
 
 首先 setState 可以是同步也可以是异步的，在原生事件回调里是同步的，在 setTimeout 里也是同步的。
 
-由 React 控制的事件处理程序，以及生命周期函数调用 setState 不会同步更新 state 。 React 控制之外的事件中调用 setState 是同步更新的。比如原生 js 绑定的事件，setTimeout/setInterval 等。
+### 当你调用 setState 的时候发生了什么事儿？
 
-调用 setState 后，首先将 state 放到一个 updateQueue 中，然后根据这个更新队列构造新的虚拟 dom，在做 diff。
+1. 将传递给 setState 的对象合并到组件的当前状态，放到 updateQueue 中，触发调和过程
+2. 然后生成新的 DOM 树，并和旧的 DOM 树进行 Diff 比较
+3. 根据对比差异生成 patch，对界面进行局部更新。
 
 ## 4. key 的作用
 
@@ -98,7 +100,7 @@ export default function shallEqual(objA, objB){
 
 ## 8. react 和 vue 的区别
 
-1. 监听数据变化的实现原理不同。vue 是通过 defineProperty 或者 proxy 给 data 对象增加 getter/setter，以及一些函数劫持，精确制导数据变化。React 是通过比较引用。
+1. 监听数据变化的实现原理不同。vue 是通过双向绑定，采用数据劫持结合发布者-订阅者模式的方式，通过 Object.defineProperty()来劫持各个属性的 setter，getter，在数据变动时发布消息给订阅者，触发相应的监听回调。React 是通过比较引用。
 2. 数据流不同，vue 是双向绑定，react 提倡单向数据流。
 3. 组建通信不同，主要体现在跨级组件，React 一般使用回调函数，Vue 一般是 Bus、事件通信。
 4. 渲染方式不同，react 是通过 jsx 渲染模板，而 vue 是通过指令实现的模板渲染。
@@ -162,3 +164,24 @@ fiber 是一个工作单元，执行更新任务的整个流程就是在反复�
 
 如果在执行更新的时候，有新任务进来，会判断两个任务的优先级高低，加入新任务优先级高，那么打断
 旧的任务，重新开始，否则继续执行任务。
+
+## 12. react-router 与浏览器路由的区别
+
+- 浏览器路由：hash、history
+
+  - hash 的实现就是基于 location.hash 实现的，url 中#以及#后面的部分的变更，改变 url 的 hash 值是不会刷新页面的，那就可以通过改变 hash，然后监听 hashchange 事件，展示和隐藏 UI，达到一个前端路由的变化。
+  - history ： history.pushState() history.replaceState() API 可以在不进行刷新的情况下，操作浏览器的历史纪录。
+
+- react-router
+  react-router 引入和 history 的库，这个库提供了 action、goBack、go、location、push 和 replace 方法。这个库是根据不同的浏览器做了不同实现，旧版本的浏览器中使用 hash，高版本浏览器中使用 html5 里的 history，可以监听到路由变化，从而做到 SPA 应用中的路由切换。
+
+## 13. 组件设计原则
+
+目的就是提高复用性
+
+1. 单一职责：实现类要职责单一，颗粒度小
+2. 开闭原则：对扩展开放，对修改关闭
+
+## 14. JS 编译原理
+
+其实就是一个编译转换的过程，根据模块依赖与作用域，编译器将代码转成 AST，然后再做转换成解释器可以读懂的形式，解释器解释给特定平台。
