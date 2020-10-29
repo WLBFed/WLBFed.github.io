@@ -28,8 +28,6 @@
 - node
 
   - [基础](node/index.md)
-  - [BFF](node/bff/index.md)
-  - [GraphQL](node/graphql/index.md)
 
 - 网络
 
