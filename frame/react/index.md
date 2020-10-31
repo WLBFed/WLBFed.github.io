@@ -25,9 +25,54 @@ Diff 就是一个 patch 函数，用来查看新旧 tree 的差别，从而做 D
 
 ### 当你调用 setState 的时候发生了什么事儿？
 
-1. 将传递给 setState 的对象合并到组件的当前状态，放到 updateQueue 中，触发调和过程
-2. 然后生成新的 DOM 树，并和旧的 DOM 树进行 Diff 比较
-3. 根据对比差异生成 patch，对界面进行局部更新。
+1.  将传递给 setState 的对象合并到组件的当前状态，并触发调和过程。
+    调和过程分两个阶段：
+
+        1.  render 阶段
+            - 根据新的 props 和 state 生成新的 DOM 树，并和旧的 DOM 树进行 Diff 比较
+            - 根据对比差异生成 patch，预生成新增的 Dom 对象，先挂载到 fiber 上。
+        2.  Fiber 的异步调度阶段
+            fiber 是调和过程的最小单元，Fiber 内记录了组件数据，要执行的任务，以及 schedule 任务调度相关（见下节）信息，执行更新任务的整个流程就是在反复寻找工作单元并运行它们。
+
+            每个 fiber 其实就是一个储存了很多上下文信息的虚拟 DOM，因为他对应了组件实例以及 DOM 元素，
+            所以 fiber 也会形成 fibertree，但是不是一个树形，而是一个链表结构。
+
+            当交互事件调用 setState 后，会批量触发更新，在整个交互事件回调执行完之前 state 都不会发生变更。
+            回调执行完毕后，开始更新任务，并触发调度。调度器会给这些更新任务一一设置优先级，并且在浏览器
+            空闲的时候去执行他们，当然如果检测到有任务过期会立即触发更新。
+
+            如果在执行更新的时候，有新任务进来，会判断两个任务的优先级高低，加入新任务优先级高，那么打断
+            旧的任务，重新开始，否则继续执行任务。
+
+            其数据结构如下
+
+                ```
+                Fiber = {
+                    tag: WorkTag,
+                    key: null | string,
+                    elementType: any, // 从ReactElement 获取
+                    type: any,   // 一般与elementType相同，只对于lazy component 为null
+                    stateNode: any,
+                    return: Fiber | null,
+                    child: Fiber | null,
+                    sibling: Fiber | null,
+                    index: number,
+                    ref: null | (((handle: mixed) => void) & {_stringRef: ?string}) | RefObject,
+                    pendingProps: any, // This type will be more specific once we overload the tag.
+                    memoizedProps: any, // The props used to create the output.
+                    updateQueue: UpdateQueue<any> | null,
+                    memoizedState: any,
+                    contextDependencies: ContextDependencyList | null,
+                    mode: TypeOfMode,
+                    effectTag: SideEffectTag,
+                    nextEffect: Fiber | null,
+                    firstEffect: Fiber | null,
+                    lastEffect: Fiber | null,
+                    expirationTime: ExpirationTime,
+                    childExpirationTime: ExpirationTime,
+                    alternate: Fiber | null,
+                }
+            ```
 
 ## 4. key 的作用
 
