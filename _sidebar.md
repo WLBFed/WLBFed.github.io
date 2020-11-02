@@ -37,6 +37,9 @@
 
   - [数据结构](algorithm/data-structure/index.md)
   - [常见算法题](algorithm/normal/index.md)
+  - [数组](algorithm/array/index.md)
+  - [字符串](algorithm/string/index.md)
+  - [链表](algorithm/list/index.md)
 
 - 面经
 
