@@ -41,7 +41,7 @@
   - [字符串](algorithm/string/index.md)
   - [链表](algorithm/list/index.md)
 
-- 面经
+- 自我迭代
 
-  - [面试相关](interview/index.md)
-  - [HR 常见问题](interview/hr/index.md)
+  - [迭代计划](iteration/index.md)
+  - [日常学习](iteration/day.md)
