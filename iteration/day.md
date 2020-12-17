@@ -8,3 +8,10 @@
 ### 2. Jaeger
 
 [Jaeger-分布式调用链跟踪系统理论与实战](https://cloud.tencent.com/developer/article/1160850)
+
+### 3. 关闭chrome跨域限制
+
+```
+open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+--args --user-data-dir="/tmp/chrome_dev_test" --disable-web-security
+```
