@@ -40,8 +40,3 @@
   - [数组](algorithm/array/index.md)
   - [字符串](algorithm/string/index.md)
   - [链表](algorithm/list/index.md)
-
-- 自我迭代
-
-  - [迭代计划](iteration/index.md)
-  - [日常学习](iteration/day.md)
